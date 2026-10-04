@@ -1,280 +1,207 @@
-# E-Commerce Website
+# E-Commerce Backend
 
-A backend application for managing products in an e-commerce system, built using **Java and Spring Boot**.
+A backend REST API for managing products in an e-commerce system, built with **Java 17 and Spring Boot 4**.
 
-The project provides REST APIs for creating, viewing, updating, deleting, and searching products. It also supports uploading and retrieving product images through the API.
-
-## Features
-
-* Add new products
-* View all products
-* View a single product by ID
-* Update existing products
-* Delete products
-* Search products using keywords
-* Search by product name, description, brand, or category
-* Upload product images
-* Retrieve product images
-* Store product information using JPA/Hibernate
-* REST API based backend
-* Layered application structure
+Supports full product CRUD, image upload and retrieval, keyword-based search, user registration, and role-based access control using Spring Security.
 
 ---
 
 ## Tech Stack
 
-| Technology      | Usage                       |
-| --------------- | --------------------------- |
-| Java            | Application development     |
-| Spring Boot     | Backend framework           |
-| Spring Web      | REST API development        |
-| Spring Data JPA | Database interaction        |
-| Hibernate       | ORM                         |
-| Lombok          | Reducing boilerplate code   |
-| Maven           | Dependency management       |
-| JSON            | API request/response format |
-
----
-
-## Architecture
-
-The application follows a simple layered architecture.
-
-```text
-                         E-COMMERCE BACKEND
-                                  │
-                                  │ HTTP Request
-                                  ▼
-                    ┌─────────────────────────┐
-                    │    ProductController    │
-                    │                         │
-                    │  REST API Endpoints     │
-                    │                         │
-                    │  • Get products         │
-                    │  • Get product by ID    │
-                    │  • Add product          │
-                    │  • Update product       │
-                    │  • Delete product       │
-                    │  • Search products      │
-                    │  • Get product image    │
-                    └────────────┬────────────┘
-                                 │
-                                 │ Method calls
-                                 ▼
-                    ┌─────────────────────────┐
-                    │      ProductService     │
-                    │                         │
-                    │  • Product operations   │
-                    │  • Business logic       │
-                    │  • Image processing     │
-                    │  • Search handling      │
-                    └────────────┬────────────┘
-                                 │
-                                 │ Repository calls
-                                 ▼
-                    ┌─────────────────────────┐
-                    │    ProductRepository    │
-                    │                         │
-                    │   Spring Data JPA       │
-                    │                         │
-                    │   • CRUD operations     │
-                    │   • Custom search query │
-                    └────────────┬────────────┘
-                                 │
-                                 │ JPA / Hibernate
-                                 ▼
-                    ┌─────────────────────────┐
-                    │        DATABASE         │
-                    │                         │
-                    │        Product          │
-                    │                         │
-                    │  Product details        │
-                    │  Stock information      │
-                    │  Image information      │
-                    │  Image binary data      │
-                    └─────────────────────────┘
-```
-
-### How a request moves through the application
-
-For example, when a client requests a product:
-
-```text
-GET /api/product/1
-       │
-       ▼
-ProductController
-       │
-       ▼
-ProductService
-       │
-       ▼
-ProductRepository
-       │
-       ▼
-Database
-       │
-       ▼
-Product
-       │
-       ▼
-HTTP Response
-```
-
-The controller handles the HTTP request, the service performs the required operation, and the repository communicates with the database.
+| Technology          | Usage                        |
+| ------------------- | ---------------------------- |
+| Java 17             | Application language         |
+| Spring Boot 4.1.0   | Backend framework            |
+| Spring Web          | REST API                     |
+| Spring Data JPA     | Database interaction         |
+| Spring Security     | Authentication & authorization |
+| Hibernate           | ORM                          |
+| H2 Database         | In-memory database           |
+| Lombok              | Boilerplate reduction        |
+| Maven               | Dependency management        |
 
 ---
 
 ## Project Structure
 
-```text
+```
 e_commerce/
 │
 ├── config/
+│   ├── SecurityConfig.java
+│   └── PasswordConfig.java
 │
 ├── controller/
-│   └── ProductController.java
+│   ├── ProductController.java
+│   └── UserController.java
 │
 ├── model/
-│   └── Product.java
+│   ├── Product.java
+│   └── User.java
 │
 ├── repo/
-│   └── ProductRepository.java
+│   ├── ProductRepository.java
+│   └── UserRepository.java
 │
 ├── service/
-│   └── ProductService.java
+│   ├── ProductService.java
+│   └── UserService.java
 │
 └── ECommerceApplication.java
 ```
 
-### `controller`
-
-Contains the REST controller responsible for receiving requests and returning responses.
-
-**`ProductController.java`**
-
-Handles the product-related API endpoints.
-
-### `service`
-
-Contains the application logic for product operations.
-
-**`ProductService.java`**
-
-Acts as the middle layer between the controller and repository.
-
-### `repo`
-
-Contains the repository used to communicate with the database.
-
-**`ProductRepository.java`**
-
-Uses Spring Data JPA and also contains the custom product search query.
-
-### `model`
-
-Contains the entity classes used by the application.
-
-**`Product.java`**
-
-Represents a product stored in the database.
-
-### `config`
-
-Contains configuration-related classes for the application.
-
 ---
 
-# Product Model
+## Architecture
 
-The `Product` entity contains the following information:
-
-| Field              | Description                                |
-| ------------------ | ------------------------------------------ |
-| `id`               | Unique identifier for the product          |
-| `name`             | Name of the product                        |
-| `description`      | Description of the product                 |
-| `brand`            | Product brand                              |
-| `price`            | Price of the product                       |
-| `category`         | Product category                           |
-| `releaseDate`      | Product release date                       |
-| `productAvailable` | Indicates whether the product is available |
-| `stockQuantity`    | Number of products currently in stock      |
-| `imageName`        | Name of the uploaded image                 |
-| `imageType`        | Image content type                         |
-| `imageDate`        | Image data stored as binary data           |
-
-The ID is automatically generated by the database using JPA.
-
----
-
-# REST API
-
-The application exposes its product APIs under:
-
-```text
-/api
+```
+HTTP Request
+     │
+     ▼
+Controller  (ProductController / UserController)
+     │
+     ▼
+Service     (ProductService / UserService)
+     │
+     ▼
+Repository  (ProductRepository / UserRepository)
+     │
+     ▼
+H2 Database
 ```
 
-## Get All Products
+---
+
+## Models
+
+### Product
+
+| Field              | Type         | Description                        |
+| ------------------ | ------------ | ---------------------------------- |
+| `id`               | Integer      | Auto-generated primary key         |
+| `name`             | String       | Product name                       |
+| `description`      | String       | Product description                |
+| `brand`            | String       | Product brand                      |
+| `price`            | BigDecimal   | Product price                      |
+| `category`         | String       | Product category                   |
+| `releaseDate`      | LocalDate    | Release date (`yyyy-MM-dd`)        |
+| `productAvailable` | boolean      | Availability status                |
+| `stockQuantity`    | Integer      | Stock count                        |
+| `imageName`        | String       | Original image filename            |
+| `imageType`        | String       | Image MIME type                    |
+| `imageDate`        | byte[]       | Image binary data (`@Lob`)         |
+
+### User
+
+| Field      | Type    | Description              |
+| ---------- | ------- | ------------------------ |
+| `id`       | Integer | Auto-generated primary key |
+| `username` | String  | Unique username          |
+| `password` | String  | BCrypt hashed password   |
+| `role`     | String  | `USER` or `ADMIN`        |
+
+---
+
+## Security
+
+The application uses **Spring Security with DAO authentication** (database-backed).
+
+Passwords are hashed using **BCrypt**.
+
+Authentication is done via **HTTP Basic Auth** on every request.
+
+### Access Rules
+
+| Endpoint                        | USER | ADMIN |
+| ------------------------------- | ---- | ----- |
+| `POST /api/register`            | ✅ public | ✅ public |
+| `GET /api/products`             | ✅   | ✅    |
+| `GET /api/product/{id}`         | ✅   | ✅    |
+| `GET /api/product/{id}/image`   | ✅   | ✅    |
+| `GET /api/products/search`      | ✅   | ✅    |
+| `POST /api/product`             | ❌   | ✅    |
+| `PUT /api/product/{id}`         | ❌   | ✅    |
+| `DELETE /api/product/{id}`      | ❌   | ✅    |
+| `/h2-console/**`                | ✅ public | ✅ public |
+
+---
+
+## REST API
+
+Base URL: `http://localhost:8080/api`
+
+---
+
+### Register User
+
+```http
+POST /api/register
+Content-Type: application/json
+```
+
+```json
+{
+  "username": "admin",
+  "password": "admin123",
+  "role": "ADMIN"
+}
+```
+
+```json
+{
+  "username": "user",
+  "password": "user123",
+  "role": "USER"
+}
+```
+
+> Register users before calling any protected endpoint.
+
+---
+
+### Get All Products
 
 ```http
 GET /api/products
-```
-
-Returns all products available in the database.
-
-### Example
-
-```http
-GET http://localhost:8080/api/products
+Authorization: Basic <credentials>
 ```
 
 ---
 
-## Get Product by ID
+### Get Product by ID
 
 ```http
 GET /api/product/{id}
-```
-
-Returns a product using its ID.
-
-### Example
-
-```http
-GET http://localhost:8080/api/product/1
+Authorization: Basic <credentials>
 ```
 
 ---
 
-## Add Product
+### Add Product
 
 ```http
 POST /api/product
+Content-Type: multipart/form-data
+Authorization: Basic admin:admin123
 ```
 
-Creates a new product.
+Form parts:
 
-This endpoint accepts `multipart/form-data` so that product information and an image can be sent together.
+| Part        | Type              | Description              |
+| ----------- | ----------------- | ------------------------ |
+| `product`   | application/json  | Product JSON data        |
+| `imageFile` | file              | Product image            |
 
-### Request parts
-
-```text
-product
-imageFile
-```
-
-Example product data:
+Example product JSON:
 
 ```json
 {
   "name": "Laptop",
-  "description": "Laptop for everyday use",
+  "description": "Everyday use laptop",
   "brand": "Example",
   "price": 55000,
-  "category": "Electronics",
-  "releaseDate": "2026-01-15",
+  "category": "Laptop",
+  "releaseDate": "2024-01-15",
   "productAvailable": true,
   "stockQuantity": 10
 }
@@ -282,390 +209,147 @@ Example product data:
 
 ---
 
-## Get Product Image
+### Get Product Image
 
 ```http
 GET /api/product/{id}/image
-```
-
-Returns the image associated with a product.
-
-### Example
-
-```http
-GET http://localhost:8080/api/product/1/image
+Authorization: Basic <credentials>
 ```
 
 ---
 
-## Update Product
+### Update Product
 
 ```http
 PUT /api/product/{id}
+Content-Type: multipart/form-data
+Authorization: Basic admin:admin123
 ```
 
-Updates an existing product.
-
-The endpoint can also receive an updated image.
-
-### Example
-
-```http
-PUT /api/product/1
-```
+Same form parts as Add Product.
 
 ---
 
-## Delete Product
+### Delete Product
 
 ```http
 DELETE /api/product/{id}
-```
-
-Deletes a product from the database.
-
-### Example
-
-```http
-DELETE http://localhost:8080/api/product/1
+Authorization: Basic admin:admin123
 ```
 
 ---
 
-# Product Search
-
-The project includes a keyword-based product search API.
+### Search Products
 
 ```http
 GET /api/products/search?keyword={keyword}
+Authorization: Basic <credentials>
 ```
 
-### Example
-
-```http
-GET http://localhost:8080/api/products/search?keyword=laptop
-```
-
-The search checks the keyword against multiple product fields:
-
-```text
-                  Search Keyword
-                        │
-          ┌─────────────┼─────────────┐
-          ▼             ▼             ▼
-        Name      Description       Brand
-          │             │             │
-          └─────────────┼─────────────┘
-                        │
-                        ▼
-                     Category
-```
-
-The search is implemented using a custom query in `ProductRepository`.
-
-This makes it possible to search for a product without knowing its exact name.
-
----
-
-# Image Upload
-
-Product images are handled using Spring's `MultipartFile`.
-
-When a product is added, the application extracts information from the uploaded image:
-
-```text
-Uploaded Image
-      │
-      ├── Original filename
-      │
-      ├── Content type
-      │
-      └── Image bytes
-```
-
-The image information is stored along with the product.
-
-The image itself is stored as binary data using a JPA `@Lob` field.
-
-Images can then be retrieved through:
-
-```http
-GET /api/product/{id}/image
-```
-
----
-
-# Database Interaction
-
-The application uses **Spring Data JPA** for database operations.
-
-The repository extends Spring Data's CRUD repository, which provides commonly required operations such as:
-
-```text
-Create
-Read
-Update
-Delete
-```
-
-The application does not need to manually write SQL for these basic operations.
-
-For product searching, a custom JPQL query is used to check multiple product fields.
-
----
-
-# API Flow
-
-### Adding a product
-
-```text
-Client
-  │
-  │ POST /api/product
-  │
-  │ Product + Image
-  ▼
-ProductController
-  │
-  ▼
-ProductService
-  │
-  │ Process product
-  │ Process image
-  ▼
-ProductRepository
-  │
-  ▼
-Database
-```
-
-### Searching for products
-
-```text
-Client
-  │
-  │ GET /api/products/search?keyword=phone
-  ▼
-ProductController
-  │
-  ▼
-ProductService
-  │
-  ▼
-ProductRepository
-  │
-  │ Custom JPQL Query
-  ▼
-Database
-  │
-  ▼
-Matching Products
-  │
-  ▼
-Client
-```
-
----
-
-# Getting Started
-
-## Prerequisites
-
-Before running the project, make sure you have:
-
-* Java installed
-* Maven installed
-* A relational database
-* An IDE such as IntelliJ IDEA, Eclipse, or VS Code
-* Postman or another API testing tool
-
-You can check Java with:
-
-```bash
-java -version
-```
-
-And Maven with:
-
-```bash
-mvn -version
-```
-
----
-
-# Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/Karuppasamy2/E_Commerce-website-.git
-```
-
-Move into the project directory:
-
-```bash
-cd E_Commerce-website-
-```
-
-Configure the database connection in the Spring Boot application configuration.
+Searches across `name`, `description`, `brand`, and `category` fields (case-insensitive).
 
 Example:
 
-```properties
-spring.datasource.url=your_database_url
-spring.datasource.username=your_username
-spring.datasource.password=your_password
+```http
+GET /api/products/search?keyword=laptop
 ```
-
-Use your own database URL, username, and password.
 
 ---
 
-# Running the Application
+## H2 Console
 
-The application can be started using Maven:
+```
+URL:      http://localhost:8080/h2-console
+JDBC URL: jdbc:h2:mem:e-commerce
+Username: sa
+Password: (leave blank)
+```
+
+---
+
+## Frontend
+
+A React + Vite frontend is included under `ecom-frontend-3-main/`.
+
+To run it:
+
+```bash
+cd ecom-frontend-3-main/ecom-frontend-3-main
+npm install
+npm run dev
+```
+
+Runs at: `http://localhost:5173`
+
+When calling protected endpoints from the frontend, pass Basic Auth credentials:
+
+```js
+axios.post("http://localhost:8080/api/product", formData, {
+    auth: { username: "admin", password: "admin123" }
+})
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17
+- Maven
+- Node.js (for frontend)
+
+### Run the Backend
 
 ```bash
 mvn spring-boot:run
 ```
 
-Or run the main class from your IDE:
+Backend runs at: `http://localhost:8080`
 
-```text
-ECommerceApplication.java
+### First Steps After Starting
+
+1. Register an admin user:
+
+```bash
+curl -X POST http://localhost:8080/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123","role":"ADMIN"}'
 ```
 
-After the application starts, the API can be accessed through the configured Spring Boot port.
+2. Register a regular user:
 
-For the default port:
-
-```text
-http://localhost:8080
+```bash
+curl -X POST http://localhost:8080/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"user","password":"user123","role":"USER"}'
 ```
 
+3. Start adding and viewing products.
+
 ---
 
-# Testing with Postman
+## Configuration
 
-The APIs can be tested using Postman.
+`src/main/resources/application.properties`:
 
-Some basic requests to try:
-
-```text
-GET     /api/products
-GET     /api/product/1
-POST    /api/product
-PUT     /api/product/1
-DELETE  /api/product/1
-GET     /api/products/search?keyword=laptop
-GET     /api/product/1/image
+```properties
+spring.datasource.url=jdbc:h2:mem:e-commerce
+spring.datasource.driverClassName=org.h2.Driver
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
 ```
 
-For the product creation and update APIs, use `form-data` to send the product information and image.
+> The H2 database is in-memory. All data is lost when the application stops. To persist data, switch to a file-based or external database.
 
 ---
 
-# Example Workflow
-
-A basic product management workflow looks like this:
-
-```text
-1. Add Product
-      │
-      ▼
-2. Product stored in database
-      │
-      ▼
-3. Retrieve products
-      │
-      ▼
-4. Search for products
-      │
-      ▼
-5. Update product
-      │
-      ▼
-6. Delete product when no longer needed
-```
-
----
-
-# What I Worked On
-
-This project helped me get hands-on experience with building a backend using Spring Boot.
-
-Some of the main areas covered were:
-
-* Designing REST APIs
-* Working with HTTP methods
-* Creating Spring Boot controllers
-* Separating application logic into service and repository layers
-* Using Spring Data JPA
-* Mapping Java classes to database tables
-* Performing CRUD operations
-* Writing custom database queries
-* Handling multipart file uploads
-* Working with product images
-* Returning data through REST APIs
-
----
-
-# Future Improvements
-
-The current project focuses mainly on product management. Some features that can be added to make it a more complete e-commerce application are:
-
-* User registration and login
-* Spring Security
-* JWT-based authentication
-* Role-based access for users and admins
-* Shopping cart
-* Wishlist
-* Order management
-* Payment integration
-* Product reviews and ratings
-* Product pagination
-* Filtering and sorting
-* Admin dashboard
-* Better validation
-* Global exception handling
-* API documentation using Swagger/OpenAPI
-* External image storage
-
----
-
-# Screenshots
-
-Screenshots can be added here to show the API responses and application interface.
-
-Example:
-
-```text
-docs/
-├── products.png
-├── add-product.png
-├── search.png
-└── product-image.png
-```
-
-Then they can be included in the README using:
-
-```markdown
-![Products API](docs/products.png)
-```
-
----
-
-# Future Project Direction
-
-The current backend provides the foundation for a larger e-commerce application.
-
-The next step would be to build the user-facing frontend and extend the backend with authentication, cart management, orders, and payments.
-
-The architecture is already separated into controller, service, repository, and model layers, which makes it easier to add these features without putting all the application logic into a single class.
-
----
-
-# Author
+## Author
 
 **Karuppasamy V**
 
